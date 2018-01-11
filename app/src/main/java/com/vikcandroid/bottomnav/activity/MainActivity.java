@@ -1,12 +1,18 @@
-package com.vikcandroid.bottomnav;
+package com.vikcandroid.bottomnav.activity;
 
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+
+import com.vikcandroid.bottomnav.R;
+import com.vikcandroid.bottomnav.fragment.CartFragment;
+import com.vikcandroid.bottomnav.fragment.ProfileFragment;
+import com.vikcandroid.bottomnav.fragment.StoreFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
         actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.title_shop);
 
+        // load the store fragment by default
+        initFragment(new StoreFragment());
+
         bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
     }
@@ -34,18 +43,27 @@ public class MainActivity extends AppCompatActivity {
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    Fragment fragment;
                     switch (item.getItemId()) {
                         case R.id.navigation_shop:
                             actionBar.setTitle(R.string.title_shop);
+                            initFragment(new StoreFragment());
                             return true;
                         case R.id.navigation_cart:
                             actionBar.setTitle(R.string.title_cart);
+                            initFragment(new CartFragment());
                             return true;
                         case R.id.navigation_profile:
                             actionBar.setTitle(R.string.title_profile);
+                            initFragment(new ProfileFragment());
                     }
                     return false;
                 }
             };
+
+    private void initFragment(Fragment fragment) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.container, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
 }
