@@ -8,17 +8,22 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.vikcandroid.bottomnav.R;
 import com.vikcandroid.bottomnav.Utils.GridSpacingItemDecorator;
 import com.vikcandroid.bottomnav.adapter.StoreAdapter;
+import com.vikcandroid.bottomnav.app.BottomNavApp;
 import com.vikcandroid.bottomnav.model.Movie;
 
 import org.json.JSONArray;
@@ -37,7 +42,9 @@ public class StoreFragment extends Fragment {
     private static final String TAG = StoreFragment.class.getSimpleName();
 
     // url to fetch shopping items
-    private static final String URL = "https://api.androidhive.info/json/movies_2017.json";
+    // TODO: Add my own api later, can't depend on Ravi's too much
+    private static final String URL = "https://vikctar.com/store.json";
+//    private static final String URL = "https://api.androidhive.info/json/movies_2017.json";
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -67,6 +74,8 @@ public class StoreFragment extends Fragment {
         recyclerView.setAdapter(storeAdapter);
         recyclerView.setNestedScrollingEnabled(false);
 
+        fetchStoreItems();
+
         return rootView;
     }
 
@@ -94,17 +103,31 @@ public class StoreFragment extends Fragment {
      * Fetch shopping items
      */
     private void fetchStoreItems() {
-        JsonArrayRequest request = new JsonArrayRequest(URL, new Response.Listener<JSONArray>() {
+        final JsonArrayRequest request = new JsonArrayRequest(URL, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                // TODO finish response
+                Log.d(TAG, response.toString());
+                if (response == null) {
+                    Toast.makeText(getContext(), "could not fetch items", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                List<Movie> movieList = new Gson().fromJson(response.toString(), new TypeToken<List<Movie>>() {}.getType());
+
+                movies.clear();
+                movies.addAll(movieList);
+
+                storeAdapter.notifyDataSetChanged();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                Log.e(TAG, "Error: " + error.getMessage());
+                Toast.makeText(getActivity(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
+        BottomNavApp.getInstance().addToRequestQueue(request);
     }
 
 }
