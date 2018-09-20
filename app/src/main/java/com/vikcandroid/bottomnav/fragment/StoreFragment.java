@@ -43,8 +43,8 @@ public class StoreFragment extends Fragment {
 
     // url to fetch shopping items
     // TODO: Add my own api later, can't depend on Ravi's too much
-    private static final String URL = "https://vikctar.com/store.json";
-//    private static final String URL = "https://api.androidhive.info/json/movies_2017.json";
+//    private static final String URL = "https://vikctar.com/store.json";
+    private static final String URL = "https://api.androidhive.info/json/movies_2017.json";
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
